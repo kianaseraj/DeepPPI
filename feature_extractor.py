@@ -7,7 +7,6 @@ from protFeat.feature_extracter import extract_protein_feature
 
 #feature1: Amino Acid Composition, 20 dimensional:
 def AAC(seq_string):
-def AAC(seq_string):
     amino_acid_composition = protpy.amino_acid_composition(seq_string)
     return list((amino_acid_composition.values)[0])
 
