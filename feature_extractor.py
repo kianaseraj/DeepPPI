@@ -2,20 +2,22 @@ import protpy
 from propy import PyPro
 import math
 import numpy as np
-import protFeat 
-from protFeat.feature_extracter import extract_protein_feature
 
-#feature1: Amino Acid Composition, 20 dimensional:
+
+#feature1: Amino Acid Composition, 20 dimensional;
 def AAC(seq_string):
     amino_acid_composition = protpy.amino_acid_composition(seq_string)
     return list((amino_acid_composition.values)[0])
 
-#feeature2: Dipeptide Composition, 400 dimensional:
+#feeature2: Dipeptide Composition, 400 dimensional;
 def DPC(seq_string):
     dipeptide_composition = protpy.dipeptide_composition(seq_string)
     return dipeptide_composition.values
 
-#feature3: composition, transition, and distribution of amino acids' hydrophobicity, normalized van der waals volume, polarity, and polarizability
+
+#c1,c2,c3,t1,t2,t3,d1,d2,d3,....
+#feature3: local sequence descriptors, 504 dimsional(84*6);
+# composition, transition, and distribution of amino acids' hydrophobicity, normalized van der waals volume, polarity, and polarizability
 hydrophobicity = {"1": "RKEDQN", "2": "GASTPHY", "3": "CLVIMFW"}
 Normalized_van_der_waals_vol = {"1" : "GASTPCD", "2" : "NVEQIL", "3":"MHKFRYW"}
 polarity = {"1": "LIFWCMVY", "2" : "PATGS", "3" : "HQRKNED"}
@@ -39,15 +41,15 @@ def polarizability_descriptor(sequence):
 
 
 
-#totally 21 parameters, feature representation of 126
-#composition:percentage of each class
+#totally 21 parameters
+#composition:percentage of each class, 3 features;
 def Composition_extractor(encoding):
   composition_embedd = [encoding.count("1")/len(encoding), encoding.count("2")/len(encoding), encoding.count("3")/len(encoding), *[0]*15]
   return composition_embedd
 
 
 
-#T is the frequency of a certain class followed by another class(shifts bettween two classes)
+#T is the frequency of a certain class followed by another class(shifts bettween two classes), 3 features
 def Transition_extractor(encoding):
     transitions_ = {}
     transitions = [
@@ -103,6 +105,7 @@ def calculate_class_lengths(input_string, target_class):
 
     return lengths
 
+#15 features
 def distribution_extractor(input_string):
     class_lengths = {}
     classes = ["1", "2", "3"]
@@ -122,6 +125,74 @@ def distribution_extractor(input_string):
 
     return result
 
+
+#partitioning sequences to 6 local segments:
+def sequence_partition(sequence):
+    length = len(sequence)
+    part_length = round(length / 4)  # Integer division to get equal parts
+    seq1_4 = sequence[:part_length]
+    seq2_4 = sequence[part_length:2*part_length]
+    seq3_4 = sequence[2*part_length:3*part_length]
+    seq4_4 = sequence[3*part_length:]
+    seq1_2 = sequence[0:round(length/2)]
+    seq2_2 = sequence[round(length/2):length+1]
+    return seq1_4, seq2_4, seq3_4, seq4_4, seq1_2, seq2_2
+
+
+def local_descriptor(sequence):
+
+  #encode each seq partition in 4 property groups:
+  lc1_hydrophobicity = hydrophobicity_descriptor(sequence_partition(seq)[0])
+  lc1_van_der_waals = Normalized_van_der_waals_vol_descriptor(sequence_partition(seq)[0])
+  lc1_polarity = polarity_descriptor(sequence_partition(seq)[0])
+  lc1_polarizability = polarizability_descriptor(sequence_partition(seq)[0])
+
+  lc2_hydrophobicity = hydrophobicity_descriptor(sequence_partition(seq)[1])
+  lc2_van_der_waals = Normalized_van_der_waals_vol_descriptor(sequence_partition(seq)[1])
+  lc2_polarity = polarity_descriptor(sequence_partition(seq)[1])
+  lc2_polarizability = polarizability_descriptor(sequence_partition(seq)[1])
+
+  lc3_hydrophobicity = hydrophobicity_descriptor(sequence_partition(seq)[2])
+  lc3_van_der_waals = Normalized_van_der_waals_vol_descriptor(sequence_partition(seq)[2])
+  lc3_polarity = polarity_descriptor(sequence_partition(seq)[2])
+  lc3_polarizability = polarizability_descriptor(sequence_partition(seq)[2])
+
+  lc4_hydrophobicity = hydrophobicity_descriptor(sequence_partition(seq)[3])
+  lc4_van_der_waals = Normalized_van_der_waals_vol_descriptor(sequence_partition(seq)[3])
+  lc4_polarity = polarity_descriptor(sequence_partition(seq)[3])
+  lc4_polarizability = polarizability_descriptor(sequence_partition(seq)[3])
+
+  lc5_hydrophobicity = hydrophobicity_descriptor(sequence_partition(seq)[4])
+  lc5_van_der_waals = Normalized_van_der_waals_vol_descriptor(sequence_partition(seq)[4])
+  lc5_polarity = polarity_descriptor(sequence_partition(seq)[4])
+  lc5_polarizability = polarizability_descriptor(sequence_partition(seq)[4])
+
+  lc6_hydrophobicity = hydrophobicity_descriptor(sequence_partition(seq)[5])
+  lc6_van_der_waals = Normalized_van_der_waals_vol_descriptor(sequence_partition(seq)[5])
+  lc6_polarity = polarity_descriptor(sequence_partition(seq)[5])
+  lc6_polarizability = polarizability_descriptor(sequence_partition(seq)[5])
+
+  #
+  
+
+  lc1_composition = composition_extractor(lc1_hydrophobicity) + composition_extractor(lc1_van_der_waals) + composition_extractor(lc1_polarity) + composition_extractor(lc1_polarizability) 
+  lc2_composition = composition_extractor(lc2_hydrophobicity) + composition_extractor(lc2_van_der_waals) + composition_extractor(lc2_polarity) + composition_extractor(lc2_polarizability)
+  lc3_composition = composition_extractor(lc3_hydrophobicity) + composition_extractor(lc3_van_der_waals) + composition_extractor(lc3_polarity) + composition_extractor(lc3_polarizability)
+  lc4_composition = composition_extractor(lc4_hydrophobicity) + composition_extractor(lc4_van_der_waals) + composition_extractor(lc4_polarity) + distribution_extractor(lc4_polarizability)
+
+  lc1_transition = transition_extractor(lc1_hydrophobicity) + transition_extractor(lc1_van_der_waals) + transition_extractor(lc1_polarity) + transition_extractor(lc1_polarizability) 
+  lc2_transition = transition_extractor(lc2_hydrophobicity) + transition_extractor(lc2_van_der_waals) + transition_extractor(lc2_polarity) + transition_extractor(lc2_polarizability)
+  lc3_transition = transition_extractor(lc3_hydrophobicity) + transition_extractor(lc3_van_der_waals) + transition_extractor(lc3_polarity) + transition_extractor(lc3_polarizability)
+  lc4_transition = transition_extractor(lc4_hydrophobicity) + transition_extractor(lc4_van_der_waals) + transition_extractor(lc4_polarity) + distribution_extractor(lc4_polarizability)
+
+  lc1_distribution = distribution_extractor(lc1_hydrophobicity) + distribution_extractor(lc1_van_der_waals) + distribution_extractor(lc1_polarity) + distribution_extractor(lc1_polarizability) 
+  lc2_distribution = distribution_extractor(lc2_hydrophobicity) + distribution_extractor(lc2_van_der_waals) + distribution_extractor(lc2_polarity) + distribution_extractor(lc2_polarizability)
+  lc3_distribution = distribution_extractor(lc3_hydrophobicity) + distribution_extractor(lc3_van_der_waals) + distribution_extractor(lc3_polarity) + distribution_extractor(lc3_polarizability)
+  lc4_distribution = distribution_extractor(lc4_hydrophobicity) + distribution_extractor(lc4_van_der_waals) + distribution_extractor(lc4_polarity) + distribution_extractor(lc4_polarizability)
+
+
+import protFeat 
+from protFeat.feature_extracter import extract_protein_feature
 #feature4: Sequence Order
 #quasi sequence order, 100 dimensions
 def QSOD(input_folder, fasta_file_name):
@@ -138,5 +209,4 @@ def APAAC(seq_string):
 
     APAAC_embedding = list((PyPro.GetProDes(seq).GetAPAAC(lamda=30, weight=0.5)).values())
     return APAAC_embedding
-
 
