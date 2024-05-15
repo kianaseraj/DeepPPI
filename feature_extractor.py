@@ -22,6 +22,27 @@ hydrophobicity = {"1": "RKEDQN", "2": "GASTPHY", "3": "CLVIMFW"}
 Normalized_van_der_waals_vol = {"1" : "GASTPCD", "2" : "NVEQIL", "3":"MHKFRYW"}
 polarity = {"1": "LIFWCMVY", "2" : "PATGS", "3" : "HQRKNED"}
 polarizability = {"1" : "GASDT", "2": "CPNVEQIL", "3" : "KMHFRYW"}
+charge = {"1" : "KR", "2" : "ANCQGHILMFPSTWYV", "3" : "DE"}
+secondary_structure = {"1": "EALMQKRH", "2" : "VIYCWFT", "3" : "GNPSD"}
+solvent_accessible = {"1": "ALFGCIVW", "2" : "PKQEND", "3" : "MPSTHY"}
+surface_tension = {"1" : "GQDNAHR", "2" : "KTSEC", "3" : "ILMFPWYV"}
+prot_prot_hotspot = {"1" : "DHIKNPRWY", "2" : "EQSTGAMF", "3" : "CLV"}
+- = {"1" : "CDFMPQRWY", "2" : "AGHVLNST", "3" : "EIK"}
+prot_dna_propensity_Schneider = {"1" : "GKNQRSTY", "2" : "ADEFHILVW", "3" : "CMP"}
+prot_dna_propensity_Ahmad= {"1" : "GHKNQRSTY", "2" : "ADEFIPVW", "3" : "CLM"}
+prot_RNA_propensity_Kim = {"1" : "HKMRY", "2" : "FGILNPQSVW", "3" : "CDEAT"}
+prot_RNA_propensity_Ellis = {"1" : "HGKMRSYW", "2" : "AFINPQT", "3" : "CDELV"}
+prot_RNA_propensity_Phipps = {"1" : "HKMQRS", "2" : "ADEFGLNPVY", "3" : "CITW"}
+prot_ligand_propensity= {"1" : "CFHWY", "2" : "GILNMSTR", "3" : "AEDKPQV"}
+prot_ligand_valid_propensity_Phipps = {"1" : "CFHWYM", "2" : "DGILNSTV", "3" : "AEKPQR"}
+prot_ligand_polar_propensity = {"1" : "DEHRY", "2" : "CFKMNQSTW", "3" : "AGILPV"}
+molecular_weight = {"1" : "AGS", "2" : "CDEHIKLMNQPTV", "3" : "FRWY"}
+cLogP = {"1" : "RKDNEQH", "2" : "PYSTGACV", "3" : "WMFLI"}
+hydrogen_bond_donor = {"1" : "HKNQR", "2" : "DESTWY", "3" : "ACGFILMPV"}
+hydrogen_bond_acceptor = {"1" : "DEHNQR", "2" : "KSTWY", "3" : "ACGFILMPV"}
+water_Solubility = {"1" : "ACGKRT", "2" : "EFHILMNPQSVW", "3" : "DY"}
+Amino_acid_flexibility = {"1" : "EGKNQS", "2" : "ADHIPRTV", "3" : "CFLMWY"}
+
 
 def hydrophobicity_descriptor(sequence):
   encoding = "".join(key for aa in sequence for key, val in hydrophobicity.items() if aa in val)
@@ -37,6 +58,86 @@ def polarity_descriptor(sequence):
 
 def polarizability_descriptor(sequence):
   encoding = "".join(key for aa in sequence for key, val in polarizability.items() if aa in val)
+  return encoding
+
+def charge_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in charge.items() if aa in val)
+  return encoding
+
+def secondary_structure_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in secondary_structure.items() if aa in val)
+  return encoding
+
+def solvent_accessible_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in solvent_accessible.items() if aa in val)
+  return encoding
+
+def surface_tension_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in surface_tension.items() if aa in val)
+  return encoding
+
+def prot_prot_hotspot_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in prot_prot_hotspot.items() if aa in val)
+  return encoding
+def prot_prot_propensity_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in prot_prot_propensity.items() if aa in val)
+  return encoding
+def prot_dna_propensity_Schneider_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in prot_dna_propensity_Schneider.items() if aa in val)
+  return encoding
+def prot_dna_propensity_Ahmad_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in prot_dna_propensity_Ahmad.items() if aa in val)
+  return encoding
+def prot_RNA_propensity_Kim_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in prot_RNA_propensity_Kim.items() if aa in val)
+  return encoding
+def prot_RNA_propensity_Ellis_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in prot_RNA_propensity_Ellis.items() if aa in val)
+  return encoding
+def prot_RNA_propensity_Phipps_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in prot_RNA_propensity_Phipps.items() if aa in val)
+  return encoding
+
+def prot_ligand_propensity_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in prot_ligand_propensity.items() if aa in val)
+  return encoding
+
+
+def prot_ligand_valid_propensity_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in prot_ligand_valid_propensity.items() if aa in val)
+  return encoding
+
+def prot_ligand_polar_propensit_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in prot_ligand_polar_propensit.items() if aa in val)
+  return encoding
+
+
+def molecular_weight_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in molecular_weight.items() if aa in val)
+  return encoding
+
+
+def cLogP_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in cLogP.items() if aa in val)
+  return encoding
+
+
+def hydrogen_bond_donor_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in hydrogen_bond_donor.items() if aa in val)
+  return encoding
+
+
+def hydrogen_bond_acceptor_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in hydrogen_bond_acceptor.items() if aa in val)
+  return encoding
+
+
+def water_Solubility_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in water_Solubility.items() if aa in val)
+  return encoding
+
+def Amino_acid_flexibility_descriptor(sequence):
+  encoding = "".join(key for aa in sequence for key, val in Amino_acid_flexibility.items() if aa in val)
   return encoding
 
 
@@ -126,70 +227,17 @@ def distribution_extractor(input_string):
     return result
 
 
-#partitioning sequences to 6 local segments:
-def sequence_partition(sequence):
-    length = len(sequence)
-    part_length = round(length / 4)  # Integer division to get equal parts
-    seq1_4 = sequence[:part_length]
-    seq2_4 = sequence[part_length:2*part_length]
-    seq3_4 = sequence[2*part_length:3*part_length]
-    seq4_4 = sequence[3*part_length:]
-    seq1_2 = sequence[0:round(length/2)]
-    seq2_2 = sequence[round(length/2):length+1]
-    return seq1_4, seq2_4, seq3_4, seq4_4, seq1_2, seq2_2
+def global_descriptor(sequence):
 
+  composition_descriptor = composition_extractor(hydrophobicity_descriptor(sequence)) + composition_extractor(Normalized_van_der_waals_vol_descriptor(sequence)) + composition_extractor(polarity_descriptor(sequence)) + composition_extractor(polarizability_descriptor(sequence)) + composition_extractor(charge_descriptor(sequence)) + composition_extractor(secondary_structure_descriptor(sequence)) + composition_extractor(solvent_accessible_descriptor(sequence)) + composition_extractor(surface_tension_descriptor(sequence)) + composition_extractor(prot_prot_hotspot_descriptor(sequence)) + composition_extractor(prot_prot_propensity_descriptor(sequence)) + composition_extractor(prot_dna_propensity_Schneider_descriptor(sequence)) + composition_extractor(prot_dna_propensity_Ahmad_descriptor(sequence)) + composition_extractor(prot_RNA_propensity_Kim_descriptor(sequence)) + composition_extractor(prot_RNA_propensity_Ellis_descriptor(sequence)) + composition_extractor(prot_RNA_propensity_Phipps_descriptor(sequence)) + composition_extractor(prot_ligand_propensity_descriptor(sequence)) + composition_extractor(prot_ligand_valid_propensity_descriptor(sequence)) + composition_extractor(prot_ligand_polar_propensit_descriptor(sequence)) + composition_extractor(molecular_weight_descriptor(sequence)) + composition_extractor(cLogP_descriptor(sequence)) + composition_extractor(hydrogen_bond_donor_descriptor(sequence)) + composition_extractor(hydrogen_bond_acceptor_descriptor(sequence)) + composition_extractor(water_Solubility_descriptor(sequence)) + composition_extractor(Amino_acid_flexibility_descriptor(sequence))         
 
-def local_descriptor(sequence):
+  transition_descriptor = transition_extractor(hydrophobicity_descriptor(sequence)) + transition_extractor(Normalized_van_der_waals_vol_descriptor(sequence)) + transition_extractor(polarity_descriptor(sequence)) + transition_extractor(polarizability_descriptor(sequence)) + transition_extractor(charge_descriptor(sequence)) + transition_extractor(secondary_structure_descriptor(sequence)) + transition_extractor(solvent_accessible_descriptor(sequence)) + transition_extractor(surface_tension_descriptor(sequence)) + transition_extractor(prot_prot_hotspot_descriptor(sequence)) + transition_extractor(prot_prot_propensity_descriptor(sequence)) + transition_extractor(prot_dna_propensity_Schneider_descriptor(sequence)) + transition_extractor(prot_dna_propensity_Ahmad_descriptor(sequence)) + transition_extractor(prot_RNA_propensity_Kim_descriptor(sequence)) + transition_extractor(prot_RNA_propensity_Ellis_descriptor(sequence)) + transition_extractor(prot_RNA_propensity_Phipps_descriptor(sequence)) + transition_extractor(prot_ligand_propensity_descriptor(sequence)) + transition_extractor(prot_ligand_valid_propensity_descriptor(sequence)) + transition_extractor(prot_ligand_polar_propensit_descriptor(sequence)) + transition_extractor(molecular_weight_descriptor(sequence)) + transition_extractor(cLogP_descriptor(sequence)) + transition_extractor(hydrogen_bond_donor_descriptor(sequence)) + transition_extractor(hydrogen_bond_acceptor_descriptor(sequence)) + transition_extractor(water_Solubility_descriptor(sequence)) + transition_extractor(Amino_acid_flexibility_descriptor(sequence))         
+ 
+  distribution_descriptor = distribution_extractor(hydrophobicity_descriptor(sequence)) + distribution_extractor(Normalized_van_der_waals_vol_descriptor(sequence)) + distribution_extractor(polarity_descriptor(sequence)) + distribution_extractor(polarizability_descriptor(sequence)) + distribution_extractor(charge_descriptor(sequence)) + distribution_extractor(secondary_structure_descriptor(sequence)) + distribution_extractor(solvent_accessible_descriptor(sequence)) + distribution_extractor(surface_tension_descriptor(sequence)) + distribution_extractor(prot_prot_hotspot_descriptor(sequence)) + distribution_extractor(prot_prot_propensity_descriptor(sequence)) + distribution_extractor(prot_dna_propensity_Schneider_descriptor(sequence)) + distribution_extractor(prot_dna_propensity_Ahmad_descriptor(sequence)) + distribution_extractor(prot_RNA_propensity_Kim_descriptor(sequence)) + distribution_extractor(prot_RNA_propensity_Ellis_descriptor(sequence)) + distribution_extractor(prot_RNA_propensity_Phipps_descriptor(sequence)) + distribution_extractor(prot_ligand_propensity_descriptor(sequence)) + distribution_extractor(prot_ligand_valid_propensity_descriptor(sequence)) + distribution_extractor(prot_ligand_polar_propensit_descriptor(sequence)) + distribution_extractor(molecular_weight_descriptor(sequence)) + distribution_extractor(cLogP_descriptor(sequence)) + distribution_extractor(hydrogen_bond_donor_descriptor(sequence)) + distribution_extractor(hydrogen_bond_acceptor_descriptor(sequence)) + distribution_extractor(water_Solubility_descriptor(sequence)) + distribution_extractor(Amino_acid_flexibility_descriptor(sequence))         
 
-  #encode each seq partition in 4 property groups:
-  lc1_hydrophobicity = hydrophobicity_descriptor(sequence_partition(seq)[0])
-  lc1_van_der_waals = Normalized_van_der_waals_vol_descriptor(sequence_partition(seq)[0])
-  lc1_polarity = polarity_descriptor(sequence_partition(seq)[0])
-  lc1_polarizability = polarizability_descriptor(sequence_partition(seq)[0])
+  return composition_descriptor + transition_descriptor + distribution_descriptor
 
-  lc2_hydrophobicity = hydrophobicity_descriptor(sequence_partition(seq)[1])
-  lc2_van_der_waals = Normalized_van_der_waals_vol_descriptor(sequence_partition(seq)[1])
-  lc2_polarity = polarity_descriptor(sequence_partition(seq)[1])
-  lc2_polarizability = polarizability_descriptor(sequence_partition(seq)[1])
-
-  lc3_hydrophobicity = hydrophobicity_descriptor(sequence_partition(seq)[2])
-  lc3_van_der_waals = Normalized_van_der_waals_vol_descriptor(sequence_partition(seq)[2])
-  lc3_polarity = polarity_descriptor(sequence_partition(seq)[2])
-  lc3_polarizability = polarizability_descriptor(sequence_partition(seq)[2])
-
-  lc4_hydrophobicity = hydrophobicity_descriptor(sequence_partition(seq)[3])
-  lc4_van_der_waals = Normalized_van_der_waals_vol_descriptor(sequence_partition(seq)[3])
-  lc4_polarity = polarity_descriptor(sequence_partition(seq)[3])
-  lc4_polarizability = polarizability_descriptor(sequence_partition(seq)[3])
-
-  lc5_hydrophobicity = hydrophobicity_descriptor(sequence_partition(seq)[4])
-  lc5_van_der_waals = Normalized_van_der_waals_vol_descriptor(sequence_partition(seq)[4])
-  lc5_polarity = polarity_descriptor(sequence_partition(seq)[4])
-  lc5_polarizability = polarizability_descriptor(sequence_partition(seq)[4])
-
-  lc6_hydrophobicity = hydrophobicity_descriptor(sequence_partition(seq)[5])
-  lc6_van_der_waals = Normalized_van_der_waals_vol_descriptor(sequence_partition(seq)[5])
-  lc6_polarity = polarity_descriptor(sequence_partition(seq)[5])
-  lc6_polarizability = polarizability_descriptor(sequence_partition(seq)[5])
-
-  #
   
-
-  lc1_composition = composition_extractor(lc1_hydrophobicity) + composition_extractor(lc1_van_der_waals) + composition_extractor(lc1_polarity) + composition_extractor(lc1_polarizability) 
-  lc2_composition = composition_extractor(lc2_hydrophobicity) + composition_extractor(lc2_van_der_waals) + composition_extractor(lc2_polarity) + composition_extractor(lc2_polarizability)
-  lc3_composition = composition_extractor(lc3_hydrophobicity) + composition_extractor(lc3_van_der_waals) + composition_extractor(lc3_polarity) + composition_extractor(lc3_polarizability)
-  lc4_composition = composition_extractor(lc4_hydrophobicity) + composition_extractor(lc4_van_der_waals) + composition_extractor(lc4_polarity) + distribution_extractor(lc4_polarizability)
-
-  lc1_transition = transition_extractor(lc1_hydrophobicity) + transition_extractor(lc1_van_der_waals) + transition_extractor(lc1_polarity) + transition_extractor(lc1_polarizability) 
-  lc2_transition = transition_extractor(lc2_hydrophobicity) + transition_extractor(lc2_van_der_waals) + transition_extractor(lc2_polarity) + transition_extractor(lc2_polarizability)
-  lc3_transition = transition_extractor(lc3_hydrophobicity) + transition_extractor(lc3_van_der_waals) + transition_extractor(lc3_polarity) + transition_extractor(lc3_polarizability)
-  lc4_transition = transition_extractor(lc4_hydrophobicity) + transition_extractor(lc4_van_der_waals) + transition_extractor(lc4_polarity) + distribution_extractor(lc4_polarizability)
-
-  lc1_distribution = distribution_extractor(lc1_hydrophobicity) + distribution_extractor(lc1_van_der_waals) + distribution_extractor(lc1_polarity) + distribution_extractor(lc1_polarizability) 
-  lc2_distribution = distribution_extractor(lc2_hydrophobicity) + distribution_extractor(lc2_van_der_waals) + distribution_extractor(lc2_polarity) + distribution_extractor(lc2_polarizability)
-  lc3_distribution = distribution_extractor(lc3_hydrophobicity) + distribution_extractor(lc3_van_der_waals) + distribution_extractor(lc3_polarity) + distribution_extractor(lc3_polarizability)
-  lc4_distribution = distribution_extractor(lc4_hydrophobicity) + distribution_extractor(lc4_van_der_waals) + distribution_extractor(lc4_polarity) + distribution_extractor(lc4_polarizability)
-
 
 import protFeat 
 from protFeat.feature_extracter import extract_protein_feature
