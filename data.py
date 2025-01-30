@@ -3,10 +3,10 @@ from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import os
 
-
-train_data =  np.load("/fs/pool/pool-schwille-user/Frohn_Bela/Seraj-Kiana/ProteinEvolution/ProteinEvolver/ppi/deep_ppi/ppi_data/training_data_red_1500_0_duplicate.npy")
-val_data = np.load("/fs/pool/pool-schwille-user/Frohn_Bela/Seraj-Kiana/ProteinEvolution/ProteinEvolver/ppi/deep_ppi/ppi_data/validation_data_red_1500_0.npy")
-feature_dir = "/fs/pool/pool-schwille-user/Frohn_Bela/Seraj-Kiana/ProteinEvolution/ProteinEvolver/ppi/deep_ppi/tensor_feature"
+#Load the data
+train_data =  np.load("PATH/to/training_dataset")
+val_data = np.load("PAtH/to/validation_dataset")
+feature_dir = "PATH/to/feature_vectors"
 
 class ProtDataset(Dataset):
     def __init__(self, feature_dir : str, data_file : np.array):
