@@ -41,14 +41,14 @@ def CTD(sequence):
 
 #quasi sequence order
 def QSOrder(protname):
-  with open(f"/fs/pool/pool-schwille-user/Frohn_Bela/Seraj-Kiana/ProteinEvolution/ProteinEvolver/ppi/prot-feat/ProtFeat/src/feature_extraction_output/{protname}_QSOrder.txt") as f:
+  with open(f"PATH/to/feature_dir/{protname}_QSOrder.txt") as f:
     qsorder = f.read()
     qsorder = [float(i) for i in qsorder.split("\t")[1:]]
   return qsorder 
 
 #sequence coupling
 def SOCNumber(protname):
-  with open(f"/fs/pool/pool-schwille-user/Frohn_Bela/Seraj-Kiana/ProteinEvolution/ProteinEvolver/ppi/prot-feat/ProtFeat/src/feature_extraction_output/{protname}_SOCNumber.txt") as f:
+  with open(f"PATH/to/feature_dir/{protname}_SOCNumber.txt") as f:
     socnumber = f.read().strip()  # Remove leading/trailing whitespace
     soc = [float(x) for x in socnumber.split("\t")[1:]]  # Convert to float
     soc_schneider = soc[:30]  
@@ -64,8 +64,8 @@ def APAAC(sequence):
   return apaac
 
 tot = []
-for filename in os.listdir("/fs/pool/pool-schwille-user/Frohn_Bela/Seraj-Kiana/ProteinEvolution/ProteinEvolver/ppi/Sequence"):
-  sequence = (np.load(f"/fs/pool/pool-schwille-user/Frohn_Bela/Seraj-Kiana/ProteinEvolution/ProteinEvolver/ppi/Sequence/{filename}")).item()
+for filename in os.listdir("PATH/to/sequence_directory"):
+  sequence = (np.load(f"PATH/to/sequence_directory/{filename}")).item()
   protname = filename.split(".")[0]
   aac = AAC(sequence)
   dpc = DPC(sequence)
