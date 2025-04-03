@@ -1,123 +1,137 @@
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import average_precision_score
-import math 
-from math import sqrt
+# -*- coding: utf-8 -*-
+"""
+metrics.py
+
+Custom evaluation metrics for binary classification.
+Includes: accuracy, precision, recall, specificity, F1, MCC, AUC-ROC, AUPRC.
+
+Author: Kiana Seraj
+"""
+
+import numpy as np
+import math
+from sklearn.metrics import roc_auc_score, average_precision_score
 
 
-#mean squared error: 1/n∑(y-y^)^2
-def get_mse(actual, predicted):
-    loss = ((actual - predicted) ** 2).mean(axis=0)
-    return loss
-    
+def pred_to_classes(predicted, threshold=0.5):
+    """
+    Converts probabilities to binary predictions.
 
-#computing acc = tp/total
-def get_accuracy(actual, predicted, threshold):
-    correct = 0
-    predicted_classes = []
-    for prediction in predicted :
-      if prediction >= threshold :
-        predicted_classes.append(1)
-      else :
-        predicted_classes.append(0)
-    for i in range(len(actual)):
-      if actual[i] == predicted_classes[i]:
-        correct += 1
-    return correct / float(len(actual)) * 100.0
+    Args:
+        predicted (list or np.array): Model predictions.
+        threshold (float): Classification threshold.
+
+    Returns:
+        list: Binary predictions (0 or 1)
+    """
+    return [1 if p >= threshold else 0 for p in predicted]
 
 
-#creating a list of predictions, having a value bigger than 0.5 will assing 1 otherwise 0!
-def pred_to_classes(actual, predicted, threshold):
-    predicted_classes = []
-    for prediction in predicted :
-      if prediction >= threshold :
-        predicted_classes.append(1)
-      else :
-        predicted_classes.append(0)
-    return predicted_classes
-    
-#True positive
-def get_tp(actual, predicted, threshold):
-    predicted_classes = pred_to_classes(actual, predicted, threshold)
-    tp = 0
-    for i in range(len(predicted_classes)):
-      if predicted_classes[i] == 1 and actual[i] == 1:
-       tp += 1
-    return tp
-    
-     
-#False positive    
-def get_fp(actual, predicted, threshold):
-    predicted_classes = pred_to_classes(actual, predicted, threshold)
-    fp = 0
-    for i in range(len(predicted_classes)):
-      if predicted_classes[i] == 1 and actual[i] == 0:
-       fp += 1
-    return fp
+def get_confusion_matrix(actual, predicted, threshold=0.5):
+    """
+    Computes TP, FP, TN, FN given a threshold.
 
-#True negative
-
-def get_tn(actual, predicted, threshold):
-    predicted_classes = pred_to_classes(actual, predicted, threshold)
-    tn = 0
-    for i in range(len(predicted_classes)):
-      if predicted_classes[i] == 0 and actual[i] == 0:
-       tn += 1
-    return tn
-
-#False negative
-def get_fn(actual, predicted, threshold):
-    predicted_classes = pred_to_classes(actual, predicted, threshold)
-    fn = 0
-    for i in range(len(predicted_classes)):
-      if predicted_classes[i] == 0 and actual[i] == 1:
-       fn += 1
-    return fn
-    
-    
-#precision = TP/ (TP + FP)    
-def precision(actual, predicted, threshold):
-    prec = get_tp(actual, predicted, threshold) / (get_tp(actual, predicted, threshold) + get_fp(actual, predicted, threshold))
-    return prec
-    
-    
-    
-   
-# sensitivity, recall or true positive rate, recall = TP / (TP + FN)
-def sensitivity(actual, predicted, threshold):
-    sens = get_tp(actual, predicted, threshold)/ (get_tp(actual, predicted, threshold) + get_fn(actual, predicted, threshold))
-    return sens
-    
-
-    
-#Specificity = TN/(TN+FP)    
-def specificity(actual, predicted, threshold):     
-   spec =  get_tn(actual, predicted, threshold)/ (get_tn(actual, predicted, threshold) + get_fp(actual, predicted, threshold))
-   return spec
+    Returns:
+        tuple: (TP, FP, TN, FN)
+    """
+    predicted_classes = pred_to_classes(predicted, threshold)
+    tp = sum((a == 1 and p == 1) for a, p in zip(actual, predicted_classes))
+    fp = sum((a == 0 and p == 1) for a, p in zip(actual, predicted_classes))
+    tn = sum((a == 0 and p == 0) for a, p in zip(actual, predicted_classes))
+    fn = sum((a == 1 and p == 0) for a, p in zip(actual, predicted_classes))
+    return tp, fp, tn, fn
 
 
-#f1 score  = 2 / ((1/ precision) + (1/recall))   
-def f_score(actual, predicted, threshold):
-    f_sc = 2 / ( (1 / precision(actual, predicted, threshold)) + (1/ sensitivity(actual, predicted, threshold)))
-    return f_sc
+def get_accuracy(actual, predicted, threshold=0.5):
+    """
+    Accuracy = (TP + TN) / Total
+    """
+    predicted_classes = pred_to_classes(predicted, threshold)
+    correct = sum([a == p for a, p in zip(actual, predicted_classes)])
+    return correct / len(actual)
 
-   
-# Matthews correlation coefficient, mcc = (TP * TN - FP * FN) / sqrt((TN+FN) * (FP+TP) *(TN+FP) * (FN+TP)) 
-def mcc(actual, predicted, threshold):
-   tp = get_tp(actual, predicted, threshold) 
-   tn = get_tn(actual, predicted, threshold)
-   fp = get_fp(actual, predicted, threshold)
-   fn = get_fn(actual, predicted, threshold)
-   mcc_met = (tp*tn - fp*fn) / (sqrt((tn+fn)*(fp+tp)*(tn+fp)*(fn+tp)))
-   return mcc_met
-   
-   
-#auc-roc curve, a performance measurement for the classification problems at various threshold settings
+
+def precision(actual, predicted, threshold=0.5):
+    """
+    Precision = TP / (TP + FP)
+    """
+    tp, fp, _, _ = get_confusion_matrix(actual, predicted, threshold)
+    return tp / (tp + fp) if (tp + fp) != 0 else 0.0
+
+
+def recall(actual, predicted, threshold=0.5):
+    """
+    Recall (Sensitivity) = TP / (TP + FN)
+    """
+    tp, _, _, fn = get_confusion_matrix(actual, predicted, threshold)
+    return tp / (tp + fn) if (tp + fn) != 0 else 0.0
+
+
+def specificity(actual, predicted, threshold=0.5):
+    """
+    Specificity = TN / (TN + FP)
+    """
+    _, fp, tn, _ = get_confusion_matrix(actual, predicted, threshold)
+    return tn / (tn + fp) if (tn + fp) != 0 else 0.0
+
+
+def f1_score(actual, predicted, threshold=0.5):
+    """
+    F1 Score = 2 * (Precision * Recall) / (Precision + Recall)
+    """
+    p = precision(actual, predicted, threshold)
+    r = recall(actual, predicted, threshold)
+    return 2 * p * r / (p + r) if (p + r) != 0 else 0.0
+
+
+def mcc(actual, predicted, threshold=0.5):
+    """
+    Matthews Correlation Coefficient (MCC)
+    """
+    tp, fp, tn, fn = get_confusion_matrix(actual, predicted, threshold)
+    numerator = (tp * tn) - (fp * fn)
+    denominator = math.sqrt((tp + fp)*(tp + fn)*(tn + fp)*(tn + fn))
+    return numerator / denominator if denominator != 0 else 0.0
+
+
 def auroc(actual, predicted):
-   return roc_auc_score(actual, predicted)
-  
+    """
+    Area Under the ROC Curve (AUC-ROC)
+    """
+    return roc_auc_score(actual, predicted)
 
-#The area under the precision-recall curve  
+
 def auprc(actual, predicted):
-   return average_precision_score(actual, predicted)
- 
-   
+    """
+    Area Under the Precision-Recall Curve (AUPRC)
+    """
+    return average_precision_score(actual, predicted)
+
+
+def get_mse(actual, predicted):
+    """
+    Mean Squared Error (MSE)
+    """
+    actual = np.array(actual)
+    predicted = np.array(predicted)
+    return np.mean((actual - predicted) ** 2)
+
+
+def evaluate_metrics(actual, predicted, threshold=0.5):
+    """
+    Computes all relevant classification metrics.
+
+    Returns:
+        dict: A dictionary with all metrics.
+    """
+    return {
+        "accuracy": get_accuracy(actual, predicted, threshold),
+        "precision": precision(actual, predicted, threshold),
+        "recall": recall(actual, predicted, threshold),
+        "specificity": specificity(actual, predicted, threshold),
+        "f1_score": f1_score(actual, predicted, threshold),
+        "mcc": mcc(actual, predicted, threshold),
+        "auroc": auroc(actual, predicted),
+        "auprc": auprc(actual, predicted),
+        "mse": get_mse(actual, predicted)
+    }
