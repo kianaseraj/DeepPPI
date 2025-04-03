@@ -1,203 +1,244 @@
+"""
+utils.py
+
+Utility functions for computing protein sequence descriptors including:
+- Amino acid composition
+- Physicochemical property encodings
+- Sequence order and transition metrics
+- Quasi sequence order, pseudo amino acid composition
+- UniProt sequence fetching
+
+Author: Kiana Seraj
+"""
 
 from constants import *
 import math
 import numpy as np
-import protpy 
+import protpy
+import requests
 from protFeat.feature_extracter import extract_protein_feature
 
-#feature1: Amino Acid Composition, 20 features
+# =========================
+# Feature 1: Basic Composition Descriptors
+# =========================
+
 def AAC(sequence):
+    """
+    Amino Acid Composition (AAC), 20 features.
+
+    Args:
+        sequence (str): Amino acid sequence.
+
+    Returns:
+        list: Normalized AAC features.
+    """
     amino_acid_composition = protpy.amino_acid_composition(sequence)
-    aac = [i/100 for i in amino_acid_composition.values[0]]
-    return aac
+    return [i / 100 for i in amino_acid_composition.values[0]]
 
-#feeature2: Dipeptide Composition, 400 features
+
 def DPC(sequence):
+    """
+    Dipeptide Composition (DPC), 400 features.
+
+    Args:
+        sequence (str): Amino acid sequence.
+
+    Returns:
+        list: Normalized DPC features.
+    """
     dipeptide_composition = protpy.dipeptide_composition(sequence)
-    dpc = [i/100 for i in dipeptide_composition.values[0]]
-    return dpc
-#feature3: composition, transition, and distribution of physiochemical properties, 504 features
-def hydrophobicity_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in hydrophobicity.items() if aa in val)
-  return encoding
-
-def Normalized_van_der_waals_vol_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in Normalized_van_der_waals_vol.items() if aa in val)
-  return encoding
-
-def polarity_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in polarity.items() if aa in val)
-  return encoding
-
-def polarizability_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in polarizability.items() if aa in val)
-  return encoding
-
-def charge_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in charge.items() if aa in val)
-  return encoding
-
-def secondary_structure_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in secondary_structure.items() if aa in val)
-  return encoding
-
-def solvent_accessible_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in solvent_accessible.items() if aa in val)
-  return encoding
-
-def surface_tension_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in surface_tension.items() if aa in val)
-  return encoding
-
-def prot_prot_hotspot_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in prot_prot_hotspot.items() if aa in val)
-  return encoding
-def prot_prot_propensity_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in prot_prot_propensity.items() if aa in val)
-  return encoding
-def prot_dna_propensity_Schneider_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in prot_dna_propensity_Schneider.items() if aa in val)
-  return encoding
-def prot_dna_propensity_Ahmad_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in prot_dna_propensity_Ahmad.items() if aa in val)
-  return encoding
-def prot_RNA_propensity_Kim_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in prot_RNA_propensity_Kim.items() if aa in val)
-  return encoding
-def prot_RNA_propensity_Ellis_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in prot_RNA_propensity_Ellis.items() if aa in val)
-  return encoding
-def prot_RNA_propensity_Phipps_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in prot_RNA_propensity_Phipps.items() if aa in val)
-  return encoding
-
-def prot_ligand_propensity_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in prot_ligand_propensity.items() if aa in val)
-  return encoding
+    return [i / 100 for i in dipeptide_composition.values[0]]
 
 
-def prot_ligand_valid_propensity_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in prot_ligand_valid_propensity.items() if aa in val)
-  return encoding
+def APAAC(sequence):
+    """
+    Amphiphilic Pseudo Amino Acid Composition, 80 features.
 
-def prot_ligand_polar_propensity_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in prot_ligand_polar_propensity.items() if aa in val)
-  return encoding
+    Args:
+        sequence (str): Amino acid sequence.
 
-def molecular_weight_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in molecular_weight.items() if aa in val)
-  return encoding
-
-def cLogP_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in cLogP.items() if aa in val)
-  return encoding
-
-def hydrogen_bond_donor_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in hydrogen_bond_donor.items() if aa in val)
-  return encoding
-
-def hydrogen_bond_acceptor_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in hydrogen_bond_acceptor.items() if aa in val)
-  return encoding
+    Returns:
+        list: APAAC features.
+    """
+    return protpy.amphiphilic_pseudo_amino_acid_composition(sequence, lamda=30, weight=0.5)
 
 
-def water_Solubility_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in water_Solubility.items() if aa in val)
-  return encoding
+# =========================
+# Feature 2: Physicochemical Property Encodings (Each returns a 1/2/3-encoded string)
+# =========================
 
-def Amino_acid_flexibility_descriptor(sequence):
-  encoding = "".join(key for aa in sequence for key, val in Amino_acid_flexibility.items() if aa in val)
-  return encoding
+def _property_descriptor(sequence, prop_dict):
+    return "".join(key for aa in sequence for key, val in prop_dict.items() if aa in val)
 
-#composition(frequency of each defined class), 3 features
+# Automatically generated wrappers
+hydrophobicity_descriptor = lambda seq: _property_descriptor(seq, hydrophobicity)
+Normalized_van_der_waals_vol_descriptor = lambda seq: _property_descriptor(seq, Normalized_van_der_waals_vol)
+polarity_descriptor = lambda seq: _property_descriptor(seq, polarity)
+polarizability_descriptor = lambda seq: _property_descriptor(seq, polarizability)
+charge_descriptor = lambda seq: _property_descriptor(seq, charge)
+secondary_structure_descriptor = lambda seq: _property_descriptor(seq, secondary_structure)
+solvent_accessible_descriptor = lambda seq: _property_descriptor(seq, solvent_accessible)
+surface_tension_descriptor = lambda seq: _property_descriptor(seq, surface_tension)
+prot_prot_hotspot_descriptor = lambda seq: _property_descriptor(seq, prot_prot_hotspot)
+prot_prot_propensity_descriptor = lambda seq: _property_descriptor(seq, prot_prot_propensity)
+prot_dna_propensity_Schneider_descriptor = lambda seq: _property_descriptor(seq, prot_dna_propensity_Schneider)
+prot_dna_propensity_Ahmad_descriptor = lambda seq: _property_descriptor(seq, prot_dna_propensity_Ahmad)
+prot_RNA_propensity_Kim_descriptor = lambda seq: _property_descriptor(seq, prot_RNA_propensity_Kim)
+prot_RNA_propensity_Ellis_descriptor = lambda seq: _property_descriptor(seq, prot_RNA_propensity_Ellis)
+prot_RNA_propensity_Phipps_descriptor = lambda seq: _property_descriptor(seq, prot_RNA_propensity_Phipps)
+prot_ligand_propensity_descriptor = lambda seq: _property_descriptor(seq, prot_ligand_propensity)
+prot_ligand_valid_propensity_descriptor = lambda seq: _property_descriptor(seq, prot_ligand_valid_propensity)
+prot_ligand_polar_propensity_descriptor = lambda seq: _property_descriptor(seq, prot_ligand_polar_propensity)
+molecular_weight_descriptor = lambda seq: _property_descriptor(seq, molecular_weight)
+cLogP_descriptor = lambda seq: _property_descriptor(seq, cLogP)
+hydrogen_bond_donor_descriptor = lambda seq: _property_descriptor(seq, hydrogen_bond_donor)
+hydrogen_bond_acceptor_descriptor = lambda seq: _property_descriptor(seq, hydrogen_bond_acceptor)
+water_Solubility_descriptor = lambda seq: _property_descriptor(seq, water_Solubility)
+Amino_acid_flexibility_descriptor = lambda seq: _property_descriptor(seq, Amino_acid_flexibility)
+
+
+# =========================
+# Feature 3: CTD Encoding (Composition, Transition, Distribution)
+# =========================
+
 def composition_descriptor(encoding):
-  composition_embedd = [encoding.count("1")/len(encoding), encoding.count("2")/len(encoding), encoding.count("3")/len(encoding)]
-  return composition_embedd
+    """
+    Composition descriptor: frequency of classes 1, 2, 3 in encoded string.
 
-#Transition(shifts between two classes), 3 featuresdef transition_descriptor(encoding):
+    Args:
+        encoding (str): Encoded property string (e.g., '1213231...').
+
+    Returns:
+        list: Composition feature vector (length 3).
+    """
+    return [encoding.count("1")/len(encoding), encoding.count("2")/len(encoding), encoding.count("3")/len(encoding)]
+
+
 def transition_descriptor(encoding):
+    """
+    Transition descriptor: frequency of transitions between classes (1-2, 1-3, 2-3).
+
+    Args:
+        encoding (str): Encoded property string.
+
+    Returns:
+        list: Transition frequencies (length 3).
+    """
     transitions_ = {}
     transitions = ["12", "13", "21", "23", "31", "32"]
-
     for i in range(len(encoding) - 1):
         transition = encoding[i:i+2]
         if transition in transitions:
             transitions_[transition] = transitions_.get(transition, 0) + 1
 
-    # Combine counts for transitions with the same group
-    combined_transitions = {"12": 0, "13": 0, "23": 0}
-    for transition, count in transitions_.items():
-        if transition in ["12", "21"]:
-            combined_transitions["12"] += count
-        elif transition in ["13", "31"]:
-            combined_transitions["13"] += count
-        else:  # transition in ["23", "32"]
-            combined_transitions["23"] += count
+    combined = {"12": 0, "13": 0, "23": 0}
+    for t, count in transitions_.items():
+        if t in ["12", "21"]: combined["12"] += count
+        elif t in ["13", "31"]: combined["13"] += count
+        else: combined["23"] += count
 
-    total_length = len(encoding)
-    if total_length > 1:
-        transition_embedd = [
-            combined_transitions["12"] / (total_length - 1),
-            combined_transitions["13"] / (total_length - 1),
-            combined_transitions["23"] / (total_length - 1)
-        ]
-    else:
-        transition_embedd = [0.0, 0.0, 0.0]
-
-    return transition_embedd
+    denom = len(encoding) - 1 if len(encoding) > 1 else 1
+    return [combined["12"]/denom, combined["13"]/denom, combined["23"]/denom]
 
 
-#Distribution(the percentage of a sequence segment within which the first, 25%, 50%, 75%, 100% of a certain class appears), 15 features
-def calculate_class_lengths(input_string, target_class):
-    total_length = len(input_string)
-    class_positions = [i for i, char in enumerate(input_string) if char == target_class]
-    class_count = len(class_positions)
-    lengths = {
-        '0%': 0,
-        '25%': 0,
-        '50%': 0,
-        '75%': 0,
-        '100%': 0
-    }
+def calculate_class_lengths(encoding, target_class):
+    """
+    Internal function for distribution descriptor.
 
-    if class_count > 0:
-        lengths['0%'] = class_positions[0] + 1
-        lengths['25%'] = class_positions[min(math.ceil(class_count * 0.25), class_count) - 1] + 1
-        lengths['50%'] = class_positions[min(math.ceil(class_count * 0.50), class_count) - 1] + 1
-        lengths['75%'] = class_positions[min(math.ceil(class_count * 0.75), class_count) - 1] + 1
-        lengths['100%'] = class_positions[-1] + 1
+    Returns the position (1-based) of the first, 25%, 50%, 75%, and 100% occurrence of a class.
+    """
+    positions = [i for i, char in enumerate(encoding) if char == target_class]
+    if not positions:
+        return [0] * 5
 
-    return lengths
+    n = len(positions)
+    return [
+        positions[0]+1,
+        positions[min(math.ceil(n*0.25)-1, n-1)]+1,
+        positions[min(math.ceil(n*0.50)-1, n-1)]+1,
+        positions[min(math.ceil(n*0.75)-1, n-1)]+1,
+        positions[-1]+1
+    ]
 
-#15 features
-def distribution_descriptor(input_string):
-    class_lengths = {}
-    classes = ["1", "2", "3"]
-    for target_class in classes:
-        class_lengths[target_class] = calculate_class_lengths(input_string, target_class)
 
-    # Normalize lengths by the total length of the input string
-    normalized_lengths = {key: {k: (v / len(input_string)) for k, v in lengths.items()} for key, lengths in class_lengths.items()}
+def distribution_descriptor(encoding):
+    """
+    Distribution descriptor: relative positions of key percentiles for each class.
 
-    # Convert normalized lengths to a single list
-    result = []
-    for target_class in classes:
-        result.extend(normalized_lengths[target_class].values())
+    Args:
+        encoding (str): Encoded string.
 
-    return result
+    Returns:
+        list: 15 distribution features.
+    """
+    features = []
+    for c in ["1", "2", "3"]:
+        raw = calculate_class_lengths(encoding, c)
+        features.extend([r / len(encoding) for r in raw])
+    return features
 
-#feature4:
-#quasi sequence order, 100 dimensions
+
+# =========================
+# Feature 4: Sequence Order
+# =========================
+
 def QSOD(input_folder, fasta_file_name):
-    descriptor = extract_protein_feature("QSOrder" , input_folder, fasta_file_name, place_protein_id = 0)
-    return descriptor
+    """
+    Quasi Sequence Order Descriptor (QSOD), 100 dimensions.
 
-#sequence order coupling, 60 dimensions
+    Args:
+        input_folder (str): Path to directory containing FASTA.
+        fasta_file_name (str): File name of the FASTA.
+
+    Returns:
+        list: QSOD features.
+    """
+    return extract_protein_feature("QSOrder", input_folder, fasta_file_name, place_protein_id=0)
+
+
 def SOCD(input_folder, fasta_file_name):
-    descriptor = extract_protein_feature("SOCNumber", 0, input_folder, fasta_file_name, place_protein_id = 0)
-    return descriptor
+    """
+    Sequence Order Coupling Descriptor (SOCD), 60 dimensions.
 
-#feature5: Amphiphilic Pseudo Amino Acid Composition, 80 diminesions
-def APAAC(sequence):
-  apaac = protpy.amphiphilic_pseudo_amino_acid_composition(sequence,lamda= 30, weight = 0.5)
-  return apaac
+    Args:
+        input_folder (str): Path to directory containing FASTA.
+        fasta_file_name (str): File name of the FASTA.
+
+    Returns:
+        list: SOCD features.
+    """
+    return extract_protein_feature("SOCNumber", input_folder, fasta_file_name, place_protein_id=0)
+
+
+# =========================
+# Extra: Fetching Sequences from UniProt
+# =========================
+
+def fetch_sequence(uniprot_id):
+    """
+    Fetch a protein sequence from UniProt using its UniProt ID.
+
+    Args:
+        uniprot_id (str): e.g., 'P12345'
+
+    Returns:
+        str or None: Protein sequence if found, else None.
+    """
+    url = f"https://www.uniprot.org/uniprot/{uniprot_id}.fasta"
+    response = requests.get(url)
+    if response.status_code == 200:
+        lines = response.text.split('\n')
+        return ''.join(lines[1:])
+    else:
+        print(f"[Error] Failed to fetch sequence for UniProt ID: {uniprot_id}")
+        return None
+
+
+# Example usage (can be moved to a separate script or __main__ guard)
+if __name__ == "__main__":
+    example_id = "P12345"
+    sequence = fetch_sequence(example_id)
+    if sequence:
+        print(f"Sequence for UniProt ID {example_id}:\n{sequence}")
+    else:
+        print("No sequence found.")
