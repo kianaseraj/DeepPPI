@@ -14,9 +14,9 @@ from torch.optim.lr_scheduler import MultiStepLR
 from tqdm import tqdm
 import numpy as np
 
-from metrics import get_accuracy, get_mse
-from model import FC
-from data import train_loader, val_loader
+from src.metrics import get_accuracy, get_mse
+from src.model import FC
+from src.data import train_loader, val_loader
 
 
 # Set device
