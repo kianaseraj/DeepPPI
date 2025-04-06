@@ -76,24 +76,13 @@ All metrics are defined in `metrics.py`:
 - Accuracy
 - Precision
 - Recall (Sensitivity)
-- Specificity
 - F1 Score
-- Matthews Correlation Coefficient (MCC)
-- AUROC (Area Under ROC Curve)
-- AUPRC (Area Under Precision-Recall Curve)
-- MSE (Mean Squared Error)
 
+### Note on Dataset Privacy and Project Context
 
+The DeepPPI model in this repository was implemented as part of a broader benchmarking project. The aim was to demonstrate how information leakage can occur in protein-protein interaction datasets, due to high sequence similarity between proteins across training and test sets. Our work highlights the importance of properly splitting datasets to avoid artificially inflated performance.
 
-### To-Do
+The code provided here benchmarks DeepPPI against other models using our custom dataset. However, due to privacy constraints, the dataset is not publicly available in this repository.
 
-
-- [x] Feature extraction pipeline
-- [x] Model training & metrics
-- [ ] Add `argparse` CLI interface
-- [ ] Save model checkpoints
-- [ ] ROC & PR Curve visualization
-- [ ] Modular `src/` structure
-- [ ] Write full `requirements.txt`
 
 
