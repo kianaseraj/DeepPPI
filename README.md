@@ -84,13 +84,6 @@ All metrics are defined in `metrics.py`:
 - MSE (Mean Squared Error)
 
 
-### Example Training Output
-
-
-Epoch 5/30
-Train loss: 0.0312 - Train accuracy: 91.34%
-Val loss: 0.0279 - Val accuracy: 92.47%
-
 
 ### To-Do
 
