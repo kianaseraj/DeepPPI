@@ -89,22 +89,7 @@ All metrics are defined in `metrics.py`:
 
 Epoch 5/30
 Train loss: 0.0312 - Train accuracy: 91.34%
-Val loss: 0.0279 - Val accuracy: 92.87%
-
-
-### Unit Tests (test_deep_ppi.py)
-
-
-To run tests:
-   pytest test_deep_ppi.py
-
-Covered functions:
-- AAC() and descriptor outputs
-- hydrophobicity_descriptor()
-- CTD (composition/transition/distribution)
-- QSO/SOC shape validation
-
-More tests will be added for model forward pass and DataLoader.
+Val loss: 0.0279 - Val accuracy: 92.47%
 
 
 ### To-Do
